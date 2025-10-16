@@ -1,6 +1,7 @@
 import React, { useReducer, useRef, useCallback } from "react";
 import { useSignaling } from "./useSignaling";
 import { useKeyboard } from "./useKeyboard";
+import useMouse from "./useMouse";
 
 type RemoteDesktopProps = {
   url: string;
@@ -8,12 +9,7 @@ type RemoteDesktopProps = {
 
 const initialState = {
   status: { text: "Disconnected", className: "disconnected" },
-  logs: [] as Array<{ timestamp: string; message: string }>,
-  messages: [] as Array<{ sender: string; message: string; id: number }>,
-  messageInput: "",
-  isConnected: false,
-  canCreateOffer: false,
-  canSendMessage: false,
+  remoteScreenSize: { width: 800, height: 600 },
 };
 
 function reducer(state: typeof initialState, action: any) {
@@ -23,34 +19,14 @@ function reducer(state: typeof initialState, action: any) {
         ...state,
         status: { text: action.text, className: action.className },
       };
-    // case "ADD_LOG":
-    //   return {
-    //     ...state,
-    //     logs: [
-    //       ...state.logs,
-    //       { timestamp: action.timestamp, message: action.message },
-    //     ],
-    //   };
-    // case "ADD_MESSAGE":
-    //   return {
-    //     ...state,
-    //     messages: [
-    //       ...state.messages,
-    //       { sender: action.sender, message: action.message, id: Date.now() },
-    //     ],
-    //   };
-    case "SET_MESSAGE_INPUT":
-      return { ...state, messageInput: action.value };
-    case "CLEAR_MESSAGE_INPUT":
-      return { ...state, messageInput: "" };
-    case "SET_CONNECTED":
-      return { ...state, isConnected: action.value };
-    case "SET_CAN_CREATE_OFFER":
-      return { ...state, canCreateOffer: action.value };
-    case "SET_CAN_SEND_MESSAGE":
-      return { ...state, canSendMessage: action.value };
-    case "RESET":
-      return initialState;
+    case "UPDATE_REMOTE_SCREEN_DIMENTIONS":
+      return {
+        ...state,
+        remoteScreenSize: {
+          width: action.width,
+          height: action.height,
+        },
+      };
     default:
       return state;
   }
@@ -91,6 +67,12 @@ const RemoteDesktop: React.FC<RemoteDesktopProps> = ({ url }) => {
   });
 
   useKeyboard(videoRef, sendMessage);
+  useMouse(
+    videoRef,
+    sendMessage,
+    state.remoteScreenSize.width,
+    state.remoteScreenSize.height
+  );
 
   return (
     <div className="min-h-screen bg-gray-100 py-12 px-4">
@@ -103,6 +85,13 @@ const RemoteDesktop: React.FC<RemoteDesktopProps> = ({ url }) => {
             muted
             playsInline
             className="w-full max-w-2xl bg-black rounded-lg"
+            onLoadedMetadata={(ev) => {
+              dispatch({
+                type: "UPDATE_REMOTE_SCREEN_DIMENTIONS",
+                width: ev.currentTarget.videoWidth,
+                height: ev.currentTarget.videoHeight,
+              });
+            }}
           />
         </div>
       </div>
