@@ -6,6 +6,8 @@ export function useKeyboard(
 ) {
   const eventHandlerFactory = React.useCallback(
     (eventType: string) => async (event: KeyboardEvent) => {
+      if (!videoRef.current?.matches(":focus")) return;
+
       event.preventDefault();
 
       const payload = {
@@ -17,26 +19,27 @@ export function useKeyboard(
       if (!sendMessage(JSON.stringify(payload)))
         console.error(`Failed to send ${eventType} message`);
     },
-    [sendMessage]
+    [sendMessage, videoRef]
   );
 
   React.useEffect(() => {
     const container = videoRef.current;
-
     if (!container) return;
+
+    container.focus();
 
     const handleKeyDown = eventHandlerFactory("keydown");
     const handleKeyUp = eventHandlerFactory("keyup");
     const handleKeyPress = eventHandlerFactory("keypress");
 
-    container.addEventListener("keydown", handleKeyDown);
-    container.addEventListener("keyup", handleKeyUp);
-    container.addEventListener("keypress", handleKeyPress);
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+    window.addEventListener("keypress", handleKeyPress);
 
     return () => {
-      container.removeEventListener("keydown", handleKeyDown);
-      container.removeEventListener("keyup", handleKeyUp);
-      container.removeEventListener("keypress", handleKeyPress);
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+      window.removeEventListener("keypress", handleKeyPress);
     };
   }, [eventHandlerFactory, videoRef]);
 }

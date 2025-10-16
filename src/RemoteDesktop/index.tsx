@@ -76,7 +76,7 @@ const RemoteDesktop: React.FC<RemoteDesktopProps> = ({ url }) => {
     }
   }, []);
 
-  const { websocket, peerConnection, dataChannel, sendMessage } = useSignaling({
+  const { sendMessage } = useSignaling({
     url,
     onStatusChange: updateStatus,
     onTrack: handleTrack,
@@ -97,6 +97,7 @@ const RemoteDesktop: React.FC<RemoteDesktopProps> = ({ url }) => {
       <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-8">
         <div className="mb-6 p-4 bg-black rounded-lg">
           <video
+            tabIndex={0}
             ref={videoRef}
             autoPlay
             muted
