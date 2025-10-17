@@ -40,6 +40,8 @@ export function useKeyboard(
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
       window.removeEventListener("keypress", handleKeyPress);
+
+      container.blur();
     };
   }, [eventHandlerFactory, videoRef]);
 }

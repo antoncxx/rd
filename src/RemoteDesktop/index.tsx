@@ -2,6 +2,7 @@ import React, { useReducer, useRef, useCallback } from "react";
 import { useSignaling } from "./useSignaling";
 import { useKeyboard } from "./useKeyboard";
 import useMouse from "./useMouse";
+import useClipboard from "./useClipboard";
 
 type RemoteDesktopProps = {
   url: string;
@@ -73,6 +74,7 @@ const RemoteDesktop: React.FC<RemoteDesktopProps> = ({ url }) => {
     state.remoteScreenSize.width,
     state.remoteScreenSize.height
   );
+  useClipboard(videoRef, sendMessage);
 
   return (
     <div className="min-h-screen bg-gray-100 py-12 px-4">

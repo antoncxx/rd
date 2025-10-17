@@ -9,8 +9,6 @@ export default function useMouse(
   type MouseEventType = "mousemove" | "mousedown" | "mouseup";
   const eventHandlerFactory = useCallback(
     (eventType: MouseEventType) => (event: MouseEvent) => {
-      event.preventDefault();
-
       const videoElement = canvasRef.current;
       if (!videoElement) return;
 
